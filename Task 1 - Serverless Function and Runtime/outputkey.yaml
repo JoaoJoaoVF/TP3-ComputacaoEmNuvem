@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  REDIS_OUTPUT_KEY: ifs4-proj3-output
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2025-01-16T23:34:25Z"
+  name: outputkey
+  namespace: joaoferreira
+  resourceVersion: "993299"
+  uid: cb25646b-3781-46f3-b1be-49264f777ebd

@@ -1,0 +1,29 @@
+apiVersion: v1
+data:
+  pyfile:
+    "import json\nimport redis\n\ndef calculate_percent_network_egress(bytes_sent:
+    int) -> float:\nreturn bytes_sent / (10**6)\n\ndef calculate_percent_memory_cached(cached_memory:
+    int, buffer_memory: int, total_memory: int) -> float:\nif total_memory == 0:\n
+    \   return 0\nreturn ((cached_memory + buffer_memory) / total_memory) * 100\n\ndef
+    update_cpu_moving_average(cpu_usage: dict, env: dict) -> dict:\ncpu_moving_avg
+    = {}\n\nfor cpu, usage in cpu_usage.items():\n    history = env.get(cpu, [])\n
+    \   history.append(usage)\n    \n    if len(history) > 12:\n        history.pop(0)\n
+    \   \n    env[cpu] = history\n    cpu_moving_avg[f\"avg-{cpu}-60sec\"] = sum(history)
+    / len(history)\n\nreturn cpu_moving_avg\n\ndef handler(input: dict, context: object)
+    -> dict:\ntimestamp = input.get(\"timestamp\")\nbytes_sent = input.get(\"net_io_counters_eth0-bytes_sent\",
+    0)\ntotal_memory = input.get(\"virtual_memory-total\", 1)\ncached_memory = input.get(\"virtual_memory-cached\",
+    0)\nbuffer_memory = input.get(\"virtual_memory-buffers\", 0)\ncpu_usage = {key:
+    value for key, value in input.items() if key.startswith(\"cpu_percent-\")}\n\npercent_network_egress
+    = calculate_percent_network_egress(bytes_sent)\npercent_memory_cached = calculate_percent_memory_cached(cached_memory,
+    buffer_memory, total_memory)\n\nenv = getattr(context, 'env', {})\ncpu_moving_avg
+    = update_cpu_moving_average(cpu_usage, env)\n\nresult = {\n    \"timestamp\":
+    timestamp,\n    \"percent-network-egress\": percent_network_egress,\n    \"percent-memory-cached\":
+    percent_memory_cached,\n    **cpu_moving_avg\n}\n\ncontext.env = env\n\nreturn
+    result"
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2025-01-16T23:33:56Z"
+  name: pyfile
+  namespace: joaoferreira
+  resourceVersion: "993169"
+  uid: 06334723-c217-4068-b65e-67ac884cad49
