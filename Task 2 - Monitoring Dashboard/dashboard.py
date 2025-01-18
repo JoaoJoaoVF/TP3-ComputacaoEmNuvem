@@ -5,7 +5,7 @@ import json
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 def fetch_data_from_redis():
-  key = 'joaoferreira-proj3-output'
+  key = '2021039654-proj3-output'
   data = redis_client.get(key)
   if data:
       return json.loads(data)

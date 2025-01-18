@@ -2,17 +2,27 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dashboard-joaoferreira
-  namespace: joaoferreira
+  labels:
+    app: dashboard
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dashboard-joaoferreira
+      app: dashboard
   template:
+    metadata:
+      labels:
+        app: dashboard
     spec:
       containers:
-        - name: dashboard-joaoferreira
-          image: joaojoaovf/ml-container:latest
-          command: ["python3", "dashboard.py"]
+        - name: dashboard
+          image: joaojoaovf/dashboard:latest
           ports:
-            - containerPort: 8501
+            - containerPort: 8703
+          env:
+            - name: REDIS_HOST
+              value: "192.168.121.187"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_KEY
+              value: "2021039654-proj3-output"
