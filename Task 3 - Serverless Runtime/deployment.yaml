@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serverless-runtime
+  labels:
+    app: serverless-runtime
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: serverless-runtime
+  template:
+    metadata:
+      labels:
+        app: serverless-runtime
+    spec:
+      containers:
+        - name: serverless-runtime
+          image: joaojoaovf/runtime:latest
+          imagePullPolicy: Always
+          env:
+            - name: REDIS_HOST
+              value: "192.168.121.187"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_INPUT_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: inputkey
+                  key: REDIS_INPUT_KEY
+            - name: REDIS_OUTPUT_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: outputkey
+                  key: REDIS_OUTPUT_KEY
+          volumeMounts:
+            - name: pyfile
+              mountPath: "/opt/usermodule.py"
+              subPath: pyfile
+      volumes:
+        - name: pyfile
+          configMap:
+            name: pyfile

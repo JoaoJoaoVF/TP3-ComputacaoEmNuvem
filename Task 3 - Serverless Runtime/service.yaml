@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: serverless-runtime-deployment
+spec:
+replicas: 1
+selector:
+  matchLabels:
+    app: serverless-runtime
+template:
+  metadata:
+    labels:
+      app: serverless-runtime
+  spec:
+    containers:
+      - name: serverless-runtime
+        image: my-serverless-runtime
