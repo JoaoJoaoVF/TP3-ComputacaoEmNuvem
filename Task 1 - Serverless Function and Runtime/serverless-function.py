@@ -25,26 +25,29 @@ def update_cpu_moving_average(cpu_usage: dict, env: dict) -> dict:
     return cpu_moving_avg
 
 def handler(input: dict, context: object) -> dict:
-    timestamp = input.get("timestamp")
-    bytes_sent = input.get("net_io_counters_eth0-bytes_sent", 0)
-    total_memory = input.get("virtual_memory-total", 1)
-    cached_memory = input.get("virtual_memory-cached", 0)
-    buffer_memory = input.get("virtual_memory-buffers", 0)
-    cpu_usage = {key: value for key, value in input.items() if key.startswith("cpu_percent-")}
+    try:
+        timestamp = input.get("timestamp")
+        bytes_sent = input.get("net_io_counters_eth0-bytes_sent", 0)
+        total_memory = input.get("virtual_memory-total", 1)
+        cached_memory = input.get("virtual_memory-cached", 0)
+        buffer_memory = input.get("virtual_memory-buffers", 0)
+        cpu_usage = {key: value for key, value in input.items() if key.startswith("cpu_percent-")}
 
-    percent_network_egress = calculate_percent_network_egress(bytes_sent)
-    percent_memory_cached = calculate_percent_memory_cached(cached_memory, buffer_memory, total_memory)
+        percent_network_egress = calculate_percent_network_egress(bytes_sent)
+        percent_memory_cached = calculate_percent_memory_cached(cached_memory, buffer_memory, total_memory)
 
-    env = getattr(context, 'env', {})
-    cpu_moving_avg = update_cpu_moving_average(cpu_usage, env)
+        env = getattr(context, 'env', {})
+        cpu_moving_avg = update_cpu_moving_average(cpu_usage, env)
 
-    result = {
-        "timestamp": timestamp,
-        "percent-network-egress": percent_network_egress,
-        "percent-memory-cached": percent_memory_cached,
-        **cpu_moving_avg
-    }
+        result = {
+            "timestamp": timestamp,
+            "percent-network-egress": percent_network_egress,
+            "percent-memory-cached": percent_memory_cached,
+            **cpu_moving_avg
+        }
 
-    context.env = env
+        context.env = env
 
-    return result
+        return result
+    except Exception as e:
+        return {"error": str(e)}
