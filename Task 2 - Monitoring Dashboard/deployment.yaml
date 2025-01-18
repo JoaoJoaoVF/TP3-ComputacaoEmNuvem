@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard-joaoferreira
+  namespace: joaoferreira
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboard-joaoferreira
+  template:
+    spec:
+      containers:
+        - name: dashboard-joaoferreira
+          image: joaojoaovf/ml-container:latest
+          command: ["python3", "dashboard.py"]
+          ports:
+            - containerPort: 8501
