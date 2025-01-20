@@ -1,8 +1,10 @@
-FROM python:latest
+FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY . /app
+COPY dashboard.py /app/dashboard.py
+
+COPY requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt
 
